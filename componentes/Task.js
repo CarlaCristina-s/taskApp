@@ -16,41 +16,40 @@ import {
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// import DateTimePicker from "react-native-ui-datepicker";
+import uuid from 'react-native-uuid';
 
 export default function Task() {
   const [modalVisible, setModalVisible] = useState(false);
-  const [task, setTask] = useState([]);
-  const [newTask, setNewTask] = useState("");
-  // const [date, setDate] = useState();
-  const [date, setDate] = useState([]);
-  const [newDate, setNewDate] = useState("");
-
-  const handleSubmit = () => {
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    const parsedDate = new Date(date);
-    if (!isNaN(parsedDate)) {
-      setFormattedDate(parsedDate.toLocaleDateString("pt-BR", options));
-    } else {
-      setFormattedDate("Data inválida");
-    }
-  };
+  const [tasks, setTasks] = useState([]);
+  const [taskName, setTaskName] = useState("");
+  const [taskDate, setTaskDate] = useState("");
 
   async function addTask() {
-    const search = task.filter((task) => task === newTask);
-    if (newTask === "") {
-      return;
-    }
-
-    if (search.length !== 0) {
+    const filteredTasks = tasks.filter((task) => task.name === taskName);
+    if (filteredTasks.length !== 0) {
       Alert.alert("Atenção", "O nome da tarefa está repetido.");
+      setTaskName("");
+      setTaskDate("");
       return;
     }
 
-    setTask([...task, newTask]);
-    setNewTask("");
-    setModalVisible(false);
+    if (taskName === "") {
+      Alert.alert("Atenção", "O nome da tarefa está vazio.");
+      setTaskName("");
+      setTaskDate("");
+      return;
+    }
 
+    const newTask = {
+      id: uuid.v4(),
+      name: taskName,
+      date: taskDate,
+    };
+
+    const tasksUpdated = [...tasks, newTask];
+    setTasks(tasksUpdated);
+
+    setModalVisible(false);
     Keyboard.dismiss();
   }
 
@@ -68,7 +67,7 @@ export default function Task() {
         },
         {
           text: "OK",
-          onPress: () => setTask(task.filter((tasks) => tasks !== item)),
+          onPress: () => setTasks(tasks.filter((tasks) => tasks !== item)),
         },
       ],
       { cancelable: false }
@@ -77,10 +76,10 @@ export default function Task() {
 
   useEffect(() => {
     async function carregarDados() {
-      const task = await AsyncStorage.getItem("task");
+      const tasks = await AsyncStorage.getItem("tasks");
 
-      if (task) {
-        setTask(JSON.parse(task));
+      if (tasks) {
+        setTasks(JSON.parse(tasks));
       }
     }
     carregarDados();
@@ -88,10 +87,10 @@ export default function Task() {
 
   useEffect(() => {
     async function salvarDados() {
-      AsyncStorage.setItem("task", JSON.stringify(task));
+      AsyncStorage.setItem("tasks", JSON.stringify(tasks));
     }
     salvarDados();
-  }, [task]);
+  }, [tasks]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -123,24 +122,28 @@ export default function Task() {
               <TextInput
                 style={styles.input}
                 placeholder="Digite a tarefa"
-                value={task}
+                value={taskName}
                 placeholderTextColor="#ccc"
                 maxLength={25}
                 autoCorrect={true}
-                onChangeText={(text) => setNewTask(text)}
+                onChangeText={setTaskName}
               />
 
               <TextInput
                 style={styles.input}
                 placeholder="Digite uma data (YYYY-MM-DD)"
-                value={date}
-                onChangeText={setDate}
+                value={taskDate}
+                onChangeText={setTaskDate}
               />
 
               <TouchableOpacity
                 style={styles.buttonAdd}
                 title="Adicionar"
-                onPress={addTask}
+                onPress={() => {
+                  addTask();
+                  setTaskName("");
+                  setTaskDate("");
+                }}
               >
                 <Text style={styles.buttonTextAdd}>Adicionar</Text>
               </TouchableOpacity>
@@ -159,13 +162,13 @@ export default function Task() {
         <View style={styles.bodyFlatlist}>
           <FlatList
             style={styles.flatlisForm}
-            data={task}
-            keyExtractor={(item) => item.toString()}
+            data={tasks}
+            keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
               <View style={styles.containerFlatlisForm}>
-                <Text style={styles.textItem}>{item}</Text>
-
+                <Text style={styles.textItem}>{item.name}</Text>
+                <Text style={styles.textItem}>{item.date}</Text>
                 <TouchableOpacity onPress={() => removeTask(item)}>
                   <MaterialIcons
                     name="delete-forever"
