@@ -16,16 +16,20 @@ import {
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import uuid from 'react-native-uuid';
+import uuid from "react-native-uuid";
 
 export default function Task() {
   const [modalVisible, setModalVisible] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [taskName, setTaskName] = useState("");
   const [taskDate, setTaskDate] = useState("");
+  const [taskFilter, setTaskFilter] = useState("");
+  const [nonFilteredTasks, setNonFilteredTasks] = useState([]);
 
   async function addTask() {
-    const filteredTasks = tasks.filter((task) => task.name === taskName);
+    const filteredTasks = nonFilteredTasks.filter(
+      (task) => task.name === taskName
+    );
     if (filteredTasks.length !== 0) {
       Alert.alert("Atenção", "O nome da tarefa está repetido.");
       setTaskName("");
@@ -46,12 +50,25 @@ export default function Task() {
       date: taskDate,
     };
 
-    const tasksUpdated = [...tasks, newTask];
-    setTasks(tasksUpdated);
+    const tasksUpdated = [...nonFilteredTasks, newTask];
+    setNonFilteredTasks(tasksUpdated);
 
     setModalVisible(false);
     Keyboard.dismiss();
   }
+
+  useEffect(() => {
+    if (taskFilter === null || taskFilter === "") {
+      setTasks(nonFilteredTasks);
+      return;
+    }
+
+    const filteredTasks = nonFilteredTasks.filter(({ name }) =>
+      name.toLowerCase().startsWith(taskFilter.toLowerCase())
+    );
+
+    setTasks(filteredTasks);
+  }, [taskFilter]);
 
   async function removeTask(item) {
     Alert.alert(
@@ -95,7 +112,7 @@ export default function Task() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#6ab09b" />
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.textHeader}>Minhas Tarefas</Text>
         </View>
@@ -109,6 +126,16 @@ export default function Task() {
             <Ionicons name="add-circle-sharp" size={26} color="#fff" />
           </Text>
         </TouchableOpacity>
+
+        <TextInput
+          style={styles.inputFilter}
+          placeholder="Buscar Tarefa"
+          value={taskFilter}
+          placeholderTextColor="#ccc"
+          maxLength={25}
+          autoCorrect={true}
+          onChangeText={setTaskFilter}
+        />
 
         <View>
           <Modal
@@ -161,6 +188,7 @@ export default function Task() {
 
         <View style={styles.bodyFlatlist}>
           <FlatList
+            horizontal="true"
             style={styles.flatlisForm}
             data={tasks}
             keyExtractor={(item) => item.id}
@@ -282,6 +310,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textTransform: "uppercase",
   },
+  inputFilter: {
+    borderColor: "#eee",
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 5,
+    margin: 15,
+    backgroundColor: "#eee",
+  },
   bodyFlatlist: {
     flex: 1,
     marginTop: 5,
@@ -311,24 +347,4 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: "center",
   },
-
-  // form: {
-  //   height: 60,
-  //   justifyContent: "center",
-  //   alignSelf: "stretch",
-  //   flexDirection: "row",
-  //   paddingTop: 10,
-  //   borderColor: "#eee",
-  //   paddingHorizontal: 10,
-  // },
-  // inputForm: {
-  //   flex: 1,
-  //   height: 40,
-  //   backgroundColor: "#eee",
-  //   borderRadius: 4,
-  //   paddingVertical: 5,
-  //   paddingHorizontal: 10,
-  //   borderWidth: 1,
-  //   borderColor: "#eee",
-  // },
 });
