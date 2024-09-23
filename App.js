@@ -1,4 +1,3 @@
-// import Home from './componentes/Home'
 import Routes from "./componentes/Routes";
 import { NavigationContainer } from "@react-navigation/native";
 

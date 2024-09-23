@@ -18,13 +18,9 @@ function Routes() {
         tabBarLabelStyle: estilos.textoAba,
         tabBarShowLabel: false,
         tabBarStyle: {
-          position: "absolute",
           backgroundColor: "#eee",
           borderTopWidth: 0,
-
-          bottom: 14,
-          left: 14,
-          right: 14,
+          marginHorizontal: 10,
           elevation: 0,
           borderRadius: 4,
           height: 50,

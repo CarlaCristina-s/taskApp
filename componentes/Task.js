@@ -52,6 +52,8 @@ export default function Task() {
 
     const tasksUpdated = [...nonFilteredTasks, newTask];
     setNonFilteredTasks(tasksUpdated);
+    setTaskFilter("");
+    setTasks(tasksUpdated);
 
     setModalVisible(false);
     Keyboard.dismiss();
@@ -123,7 +125,8 @@ export default function Task() {
           onPress={() => setModalVisible(true)}
         >
           <Text style={styles.buttonTextTask} placeholder="Nova tarefa">
-            <Ionicons name="add-circle-sharp" size={26} color="#fff" />
+            <MaterialIcons name="add-task" size={24} color="#6ab09b" />
+            Adicionar Tarefa
           </Text>
         </TouchableOpacity>
 
@@ -158,30 +161,34 @@ export default function Task() {
 
               <TextInput
                 style={styles.input}
-                placeholder="Digite uma data (YYYY-MM-DD)"
+                placeholder="Digite uma data (DD-MM-YYYY)"
+                placeholderTextColor="#ccc"
                 value={taskDate}
                 onChangeText={setTaskDate}
+                keyboardType="number-pad"
               />
 
-              <TouchableOpacity
-                style={styles.buttonAdd}
-                title="Adicionar"
-                onPress={() => {
-                  addTask();
-                  setTaskName("");
-                  setTaskDate("");
-                }}
-              >
-                <Text style={styles.buttonTextAdd}>Adicionar</Text>
-              </TouchableOpacity>
+              <View style={styles.buttonsModal}>
+                <TouchableOpacity
+                  style={styles.buttonAdd}
+                  title="Adicionar"
+                  onPress={() => {
+                    addTask();
+                    setTaskName("");
+                    setTaskDate("");
+                  }}
+                >
+                  <Text style={styles.buttonTextAdd}>Adicionar</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.buttonDel}
-                title="Cancelar"
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.buttonTextDel}>Cancelar</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.buttonDel}
+                  title="Cancelar"
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.buttonTextDel}>Cancelar</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </Modal>
         </View>
@@ -233,27 +240,32 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   buttonNewTask: {
-    width: 100,
-    height: 60,
-    justifyContent: "center",
-    alignSelf: "center",
-    borderRadius: 25,
-    backgroundColor: "#6ab09b",
-    marginHorizontal: 10,
+    marginHorizontal: 20,
+    marginVertical: 10,
+    padding: 10,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#6ab09b",
+    backgroundColor: "#eee",
+    // width: '60%',
+    // alignSelf: 'center',
   },
   buttonTextTask: {
     textAlign: "center",
-    fontSize: 20,
-    color: "#fff",
+    fontSize: 18,
+    color: "#6ab09b",
     fontWeight: "bold",
     textTransform: "uppercase",
   },
   containerModal: {
-    marginTop: 100,
-    marginHorizontal: 20,
+    marginTop: 80,
+    marginHorizontal: 10,
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 50,
+    height: 350,
+    borderWidth: 1,
+    borderColor: "#6ab09b",
     alignItems: "center",
     shadowColor: "#808080",
     shadowOffset: {
@@ -267,56 +279,65 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center",
-    fontSize: 20,
-    color: "#808080",
+    fontSize: 22,
+    color: "#6ab09b",
     fontWeight: "bold",
     textTransform: "uppercase",
   },
   input: {
-    height: 40,
-    borderColor: "#808080",
+    height: 45,
+    borderColor: "#6ab09b",
     borderWidth: 1,
     width: "100%",
     marginBottom: 15,
     paddingLeft: 10,
   },
-  buttonAdd: {
+  buttonsModal: {
+    flex: 1,
+    flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
+    alignSelf: "center",
+    width: "90%",
+    gap: 10,
+    marginTop: 15,
+  },
+  buttonAdd: {
     borderRadius: 4,
     backgroundColor: "#6ab09b",
-    padding: 15,
-    marginBottom: 15,
+    padding: 10,
+    width: 130,
+    height: 50,
   },
   buttonTextAdd: {
     textAlign: "center",
-    fontSize: 20,
+    fontSize: 18,
     color: "#fff",
     fontWeight: "bold",
     textTransform: "uppercase",
   },
   buttonDel: {
-    justifyContent: "center",
-    alignItems: "center",
     borderRadius: 4,
-    backgroundColor: "blue",
-    padding: 15,
-    marginBottom: 15,
+    backgroundColor: "red",
+    padding: 10,
+    width: 130,
+    height: 50,
   },
   buttonTextDel: {
     textAlign: "center",
-    fontSize: 20,
+    fontSize: 18,
     color: "#fff",
     fontWeight: "bold",
     textTransform: "uppercase",
   },
   inputFilter: {
-    borderColor: "#eee",
-    borderWidth: 1,
+    marginHorizontal: 20,
+    marginVertical: 10,
+    padding: 10,
     borderRadius: 4,
-    padding: 5,
-    margin: 15,
+    borderWidth: 1,
+    borderColor: "#6ab09b",
     backgroundColor: "#eee",
+    flex: 1,
   },
   bodyFlatlist: {
     flex: 1,
