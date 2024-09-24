@@ -5,7 +5,6 @@ import {
   SafeAreaView,
   StatusBar,
   Animated,
-  TouchableWithoutFeedback
 } from "react-native";
 import { useEffect, useRef } from "react";
 import LottieView from "lottie-react-native";
@@ -82,9 +81,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   textAnimationHome: {
-    alignSelf: "center",
+    // alignSelf: "center",
     fontSize: 20,
     marginVertical: 10,
+    marginHorizontal: 30,
     color: "#ccc",
   },
 });

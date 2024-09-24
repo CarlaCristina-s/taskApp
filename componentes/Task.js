@@ -12,7 +12,6 @@ import {
   FlatList,
   Alert,
   Modal,
-  Button,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -23,6 +22,7 @@ export default function Task() {
   const [tasks, setTasks] = useState([]);
   const [taskName, setTaskName] = useState("");
   const [taskDate, setTaskDate] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
   const [taskFilter, setTaskFilter] = useState("");
   const [nonFilteredTasks, setNonFilteredTasks] = useState([]);
 
@@ -34,13 +34,15 @@ export default function Task() {
       Alert.alert("Atenção", "O nome da tarefa está repetido.");
       setTaskName("");
       setTaskDate("");
+      setTaskDescription("");
       return;
     }
 
-    if (taskName === "") {
-      Alert.alert("Atenção", "O nome da tarefa está vazio.");
+    if (taskName === "" || taskDate === "" || taskDescription === "") {
+      Alert.alert("Atenção", "Preencha todos os campos.");
       setTaskName("");
       setTaskDate("");
+      setTaskDescription("");
       return;
     }
 
@@ -48,6 +50,8 @@ export default function Task() {
       id: uuid.v4(),
       name: taskName,
       date: taskDate,
+      description: taskDescription,
+      completed: false,
     };
 
     const tasksUpdated = [...nonFilteredTasks, newTask];
@@ -161,7 +165,18 @@ export default function Task() {
 
               <TextInput
                 style={styles.input}
-                placeholder="Digite uma data (DD-MM-YYYY)"
+                placeholder="Descreva sua tarefa"
+                value={taskDescription}
+                placeholderTextColor="#ccc"
+                autoCorrect={true}
+                onChangeText={setTaskDescription}
+                multiline={true}
+                numberOfLines={3}
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Digite uma data (DD-MM-YY)"
                 placeholderTextColor="#ccc"
                 value={taskDate}
                 onChangeText={setTaskDate}
@@ -176,6 +191,7 @@ export default function Task() {
                     addTask();
                     setTaskName("");
                     setTaskDate("");
+                    setTaskDescription("");
                   }}
                 >
                   <Text style={styles.buttonTextAdd}>Adicionar</Text>
@@ -202,14 +218,27 @@ export default function Task() {
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
               <View style={styles.containerFlatlisForm}>
-                <Text style={styles.textItem}>{item.name}</Text>
-                <Text style={styles.textItem}>{item.date}</Text>
-                <TouchableOpacity onPress={() => removeTask(item)}>
-                  <MaterialIcons
+                <Text style={styles.textItemTask}>{item.name}</Text>
+                <Text style={styles.textItemDescription}>
+                  {item.description}
+                </Text>
+                <Text style={styles.textItemDate}>{item.date}</Text>
+
+                <TouchableOpacity
+                  style={styles.buttonDelete}
+                  onPress={() => removeTask(item)}
+                >
+                  <Text
+                    style={styles.buttonTextDelete}
+                    placeholder="Nova tarefa"
+                  >
+                    Deletar Tarefa
+                  </Text>
+                  {/* <MaterialIcons
                     name="delete-forever"
-                    size={30}
+                    size={40}
                     color="#6ab09b"
-                  />
+                  /> */}
                 </TouchableOpacity>
               </View>
             )}
@@ -247,8 +276,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#6ab09b",
     backgroundColor: "#eee",
-    // width: '60%',
-    // alignSelf: 'center',
   },
   buttonTextTask: {
     textAlign: "center",
@@ -263,7 +290,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 50,
-    height: 350,
+    minHeight: 400,
     borderWidth: 1,
     borderColor: "#6ab09b",
     alignItems: "center",
@@ -285,7 +312,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   input: {
-    height: 45,
+    minHeight: 45,
     borderColor: "#6ab09b",
     borderWidth: 1,
     width: "100%",
@@ -329,6 +356,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textTransform: "uppercase",
   },
+  buttonDelete: {
+    marginHorizontal: 90,
+    marginTop: 15,
+    padding: 10,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#6ab09b",
+    backgroundColor: "#eee",
+  },
+  buttonTextDelete: {
+    textAlign: "center",
+    fontSize: 14,
+    color: "#6ab09b",
+    fontWeight: "bold",
+    textTransform: "uppercase",
+  },
   inputFilter: {
     marginHorizontal: 20,
     marginVertical: 10,
@@ -354,18 +397,33 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#eee",
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     borderWidth: 1,
     borderColor: "#eee",
     marginHorizontal: 10,
   },
-  textItem: {
-    fontSize: 14,
+  textItemTask: {
+    fontSize: 18,
     fontWeight: "bold",
     color: "#808080",
     marginTop: 4,
     textAlign: "center",
+    backgroundColor: '#c9e4dc',
+    borderRadius: 4
+  },
+  textItemDescription: {
+    fontSize: 14,
+    color: "#808080",
+    marginTop: 4,
+  },
+  textItemDate: {
+    fontSize: 14,
+    color: "#ccc",
+    marginTop: 4,
+  },
+  renderButtons: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
   },
 });
